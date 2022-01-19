@@ -7,7 +7,7 @@ const randomNumber = Math.round(Math.random() * 100)
 console.log('Загадано число в диапазоне от 0 до 100')
 
 input.on('line', (num) => {
-  value = Number(num)
+  const value = Number(num)
 
   if (isNaN(value)) {
     console.log('Введите число в диапазоне от 0 до 100')
