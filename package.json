@@ -1,0 +1,24 @@
+{
+  "name": "ndse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "node -r dotenv/config index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsteacat/NDSE.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jsteacat/NDSE/issues"
+  },
+  "homepage": "https://github.com/jsteacat/NDSE#readme",
+  "devDependencies": {
+    "dotenv": "^14.3.2"
+  }
+}
