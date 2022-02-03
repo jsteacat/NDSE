@@ -1,0 +1,28 @@
+{
+  "name": "library",
+  "version": "1.0.0",
+  "description": "Library App on Express",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index",
+    "dev": "nodemon index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsteacat/NDSE.git"
+  },
+  "author": "Stepan Kormilin <jsteacat@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jsteacat/NDSE/issues"
+  },
+  "homepage": "https://github.com/jsteacat/NDSE#readme",
+  "dependencies": {
+    "express": "^4.17.2",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
