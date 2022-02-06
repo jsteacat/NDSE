@@ -20,6 +20,7 @@
   "homepage": "https://github.com/jsteacat/NDSE#readme",
   "dependencies": {
     "express": "^4.17.2",
+    "multer": "^1.4.4",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
