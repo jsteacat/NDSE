@@ -44,11 +44,12 @@ router.get('/:id', (req, res) => {
 });
 
 //создать книгу
-router.post('/', fileMiddleware.single('fileBook'), (req, res) => {
+router.post('/', fileMiddleware.fields([{ name: 'fileBook', maxCount: 1 }, { name: 'fileCover', maxCount: 1 }]), (req, res) => {
   //создаем книгу и возвращаем ее объект вместе с присвоенным id
   const { books } = store;
-  const { title, description, authors, favorite, fileCover, fileName } = req.body;
-  const fileBook = req.file ? req.file.path : '';
+  const { title, description, authors, favorite, fileName } = req.body;
+  const fileBook = req.files ? req.files.fileBook?.path : '';
+  const fileCover = req.files ? req.files.fileCover?.path : '';
 
   const newBook = new Book(title, description, authors, favorite, fileCover, fileName, fileBook);
   books.push(newBook);
@@ -59,13 +60,14 @@ router.post('/', fileMiddleware.single('fileBook'), (req, res) => {
 });
 
 //редактировать книгу по id
-router.put('/:id', fileMiddleware.single('fileBook'), (req, res) => {
+router.put('/:id', fileMiddleware.fields([{ name: 'fileBook', maxCount: 1 }, { name: 'fileCover', maxCount: 1 }]), (req, res) => {
   //редактируем объект книги, если запись не найдена вернем Code: 404
   const { books } = store;
-  const { title, description, authors, favorite, fileCover, fileName } = req.body;
+  const { title, description, authors, favorite, fileName } = req.body;
   const { id } = req.params;
   const idx = books.findIndex(el => el.id === id);
-  const fileBook = req.file ? req.file.path : books[idx].fileBook;
+  const fileBook = req.files ? req.files.fileBook?.path : '';
+  const fileCover = req.files ? req.files.fileCover?.path : '';
 
   if (idx !== -1) {
     books[idx] = { ...books[idx], title, description, authors, favorite, fileCover, fileName, fileBook };
