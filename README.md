@@ -21,8 +21,8 @@
 
 ```javascript
 db.books.insertMany([
-  { title: 'title1', description: 'desc1', authors: 'author1' },
-  { title: 'title2', description: 'desc2', authors: 'author2' }
+  { title: 'title1', description: 'description1', authors: 'author1' },
+  { title: 'title2', description: 'description2', authors: 'author2' }
 ]);
 ```
 
