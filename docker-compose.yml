@@ -1,0 +1,13 @@
+services:
+  storage:
+    image: redis
+  counter:
+    image: teacat13/node-counter:final
+    environment:
+      - REDIS_URL=redis://storage
+    depends_on:
+      - storage
+  library:
+    image: teacat13/ndse-library:final
+    depends_on:
+      - counter
