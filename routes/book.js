@@ -1,6 +1,6 @@
 const path = require('path');
 const router = require('express').Router();
-const { v4: uuidv4 } = require('uuid');
+const fetch = require('node-fetch');
 const { Book } = require('../models');
 const fileMiddleware = require('../middlewares/file');
 
@@ -18,7 +18,7 @@ const store = {
     fileName = `fileName${el}`,
     fileBook = `fileBook${el}`
   );
-    store.books.push(newBook);
+  store.books.push(newBook);
 });
 
 router.get('/', (req, res) => {
@@ -49,18 +49,24 @@ router.post('/create', fileMiddleware.fields([{ name: 'fileBook', maxCount: 1 },
 });
 
 //детальная книги
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   const { books } = store;
   const { id } = req.params;
   const idx = books.findIndex(el => el.id === id);
-
-  if (idx !== -1) {
+  try {
+    if (idx !== -1) {
+      const count = await fetch(`/counter/:${id}`, {method: 'get'});
+      await fetch(`/counter/:${id}/incr`, { method: 'post' });
       res.render('book/view', {
-          title: 'Library | view',
-          book: books[idx],
+        title: 'Library | view',
+        book: books[idx],
+        count
       });
-  } else {
+    } else {
       res.status(404).redirect('/404');
+    }
+  } catch {
+    res.status(404).redirect('/404');
   }
 });
 

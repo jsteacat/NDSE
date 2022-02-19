@@ -1,5 +1,6 @@
 const path = require('path');
 const router = require('express').Router();
+const fetch = require('node-fetch');
 const { Book } = require('../../models');
 const fileMiddleware = require('../../middlewares/file');
 
@@ -17,7 +18,7 @@ const store = {
     fileName = `fileName${el}`,
     fileBook = `fileBook${el}`
   );
-    store.books.push(newBook);
+  store.books.push(newBook);
 });
 
 //получить все книги
@@ -28,18 +29,25 @@ router.get('/', (req, res) => {
 });
 
 //получить книгу по id
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   //получаем объект книги, если запись не найдена вернем Code: 404
   const { books } = store;
   const { id } = req.params;
   const idx = books.findIndex(el => el.id === id);
-
-  if (idx !== -1) {
-    res.json(books[idx]);
-  } else {
+  try {
+    if (idx !== -1) {
+      const count = await fetch(`/counter/:${id}`, { method: 'get' });
+      await fetch(`/counter/:${id}/incr`, { method: 'post' });
+      res.json({ book: books[idx], count });
+    } else {
+      res
+        .status(404)
+        .json({ errmessage: 'book | not found' });
+    }
+  } catch {
     res
-      .status(404)
-      .json('book | not found');
+      .status(400)
+      .json({ errmessage: 'Something went wrong...' });
   }
 });
 
@@ -75,7 +83,7 @@ router.put('/:id', fileMiddleware.fields([{ name: 'fileBook', maxCount: 1 }, { n
   } else {
     res
       .status(404)
-      .json('book | not found');
+      .json({ errmessage: 'book | not found' });
   }
 });
 
@@ -88,11 +96,11 @@ router.delete('/:id', (req, res) => {
 
   if (idx !== -1) {
       books.splice(idx, 1);
-      res.json('OK');
+      res.json({ message: 'OK' });
   } else {
     res
       .status(404)
-      .json('book | not found');
+      .json({ errmessage: 'book | not found' });
   }
 });
 
@@ -114,12 +122,12 @@ router.get('/:id/download', (req, res) => {
     } else {
       res
       .status(404)
-      .json('file | missing');
+        .json({ errmessage: 'file | missing' });;
     }
   } else {
     res
       .status(404)
-      .json('book | not found');
+      .json({ errmessage: 'book | not found' });
   }
 });
 
