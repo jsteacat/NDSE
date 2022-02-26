@@ -1,13 +1,22 @@
 services:
   storage:
     image: redis
+    ports:
+      - 8081:3000
   counter:
     image: teacat13/node-counter:final
+    ports:
+      - 8080:3000
     environment:
       - REDIS_URL=redis://storage
     depends_on:
       - storage
   library:
+    build: .
     image: teacat13/ndse-library:final
+    ports:
+      - 80:3000
+    environment:
+      - PORT=3000
     depends_on:
       - counter
