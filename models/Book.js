@@ -1,16 +1,13 @@
-const { v4: uuidv4 } = require('uuid');
+const {Schema, model} = require('mongoose');
 
-class Book {
-  constructor(title = '', description = '', authors = '', favorite = '', fileCover = '', fileName = '', fileBook = '', id = uuidv4()) {
-    this.id = id;
-    this.title = title;
-    this.description = description;
-    this.authors = authors;
-    this.favorite = favorite;
-    this.fileCover = fileCover;
-    this.fileName = fileName;
-    this.fileBook = fileBook;
-  }
-}
+// поле id мангус добавит по умолчанию при создании новой модели
+const BookSchema = new Schema({
+  title: String,
+  description: String,
+  authors: String,
+  favorite: String,
+  fileCover: String,
+  fileName: String
+})
 
-module.exports = Book;
+module.exports = model('Book', BookSchema);

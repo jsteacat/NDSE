@@ -3,41 +3,27 @@ const router = require('express').Router();
 const { Book } = require('../../models');
 const fileMiddleware = require('../../middlewares/file');
 
-const store = {
-  books: []
-};
-
-[1, 2, 3].map(el => {
-  const newBook = new Book(
-    title = `title${el}`,
-    description = `description${el}`,
-    authors = `authors${el}`,
-    favorite = `favorite${el}`,
-    fileCover = `fileCover${el}`,
-    fileName = `fileName${el}`,
-    fileBook = `fileBook${el}`
-  );
-    store.books.push(newBook);
-});
-
 //получить все книги
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   //получаем массив всех книг
-  const { books } = store;
+  const books = await Book.find();
   res.json(books);
 });
 
 //получить книгу по id
 router.get('/:id', (req, res) => {
-  //получаем объект книги, если запись не найдена вернем Code: 404
-  const { books } = store;
   const { id } = req.params;
-  const idx = books.findIndex(el => el.id === id);
-
-  if (idx !== -1) {
-    res.json(books[idx]);
-  } else {
-    res
+  try {
+    const book = await Book.findById(id).select('-__v');
+    if (book) {
+      res.json(book);
+    } else {
+      res
+      .status(404)
+      .json('book | not found');
+    }
+  } catch {
+     res
       .status(404)
       .json('book | not found');
   }
@@ -45,34 +31,35 @@ router.get('/:id', (req, res) => {
 
 //создать книгу
 router.post('/', fileMiddleware.fields([{ name: 'fileBook', maxCount: 1 }, { name: 'fileCover', maxCount: 1 }]), (req, res) => {
-  //создаем книгу и возвращаем ее объект вместе с присвоенным id
-  const { books } = store;
-  const { title, description, authors, favorite, fileName } = req.body;
-  const fileBook = req.files ? req.files.fileBook?.path : '';
-  const fileCover = req.files ? req.files.fileCover?.path : '';
-
-  const newBook = new Book(title, description, authors, favorite, fileCover, fileName, fileBook);
-  books.push(newBook);
-
-  res
+  // const fileBook = req.files ? req.files.fileBook?.path : '';
+  // const fileCover = req.files ? req.files.fileCover?.path : '';
+  const newBook = new Book(req.body);
+  try {
+    await newBook.save();
+    res
     .status(201)
     .json(newBook);
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 //редактировать книгу по id
 router.put('/:id', fileMiddleware.fields([{ name: 'fileBook', maxCount: 1 }, { name: 'fileCover', maxCount: 1 }]), (req, res) => {
-  //редактируем объект книги, если запись не найдена вернем Code: 404
-  const { books } = store;
-  const { title, description, authors, favorite, fileName } = req.body;
-  const { id } = req.params;
-  const idx = books.findIndex(el => el.id === id);
-  const fileBook = req.files ? req.files.fileBook?.path : '';
-  const fileCover = req.files ? req.files.fileCover?.path : '';
+  // const fileBook = req.files ? req.files.fileBook?.path : '';
+  // const fileCover = req.files ? req.files.fileCover?.path : '';
 
-  if (idx !== -1) {
-    books[idx] = { ...books[idx], title, description, authors, favorite, fileCover, fileName, fileBook };
-    res.json(books[idx]);
-  } else {
+   const { id } = req.params;
+  try {
+    const book = await Book.findByIdAndUpdate(id, req.body);
+    if (book) {
+      res.json(book);
+    } else {
+      res
+      .status(404)
+      .json('book | not found');
+    }
+  } catch (e) {
     res
       .status(404)
       .json('book | not found');
@@ -81,15 +68,12 @@ router.put('/:id', fileMiddleware.fields([{ name: 'fileBook', maxCount: 1 }, { n
 
 //удалить книгу по id
 router.delete('/:id', (req, res) => {
-  //удаляем книгу и возвращаем ответ: 'ok'
-  const { books } = store;
   const { id } = req.params;
-  const idx = books.findIndex(el => el.id === id);
-
-  if (idx !== -1) {
-      books.splice(idx, 1);
-      res.json('OK');
-  } else {
+  try {
+    await Book.deleteOne({ _id: id });
+    res.json('OK');
+  }
+  catch (e) {
     res
       .status(404)
       .json('book | not found');
@@ -97,30 +81,30 @@ router.delete('/:id', (req, res) => {
 });
 
 //скачать книгу по id
-router.get('/:id/download', (req, res) => {
-  const { books } = store;
-  const { id } = req.params;
-  const idx = books.findIndex(el => el.id === id);
+// router.get('/:id/download', (req, res) => {
+//   const { books } = store;
+//   const { id } = req.params;
+//   const idx = books.findIndex(el => el.id === id);
 
-  if (idx !== -1) {
-    const file = res.download(path.join(__dirname, '../', books[idx].fileBook), 'book.pdf', err => {
-        if (err) {
-            res.status(404).json();
-        }
-    });
+//   if (idx !== -1) {
+//     const file = res.download(path.join(__dirname, '../', books[idx].fileBook), 'book.pdf', err => {
+//         if (err) {
+//             res.status(404).json();
+//         }
+//     });
 
-    if (file !== undefined) {
-      return file;
-    } else {
-      res
-      .status(404)
-      .json('file | missing');
-    }
-  } else {
-    res
-      .status(404)
-      .json('book | not found');
-  }
-});
+//     if (file !== undefined) {
+//       return file;
+//     } else {
+//       res
+//       .status(404)
+//       .json('file | missing');
+//     }
+//   } else {
+//     res
+//       .status(404)
+//       .json('book | not found');
+//   }
+// });
 
 module.exports = router;

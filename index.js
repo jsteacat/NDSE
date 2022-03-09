@@ -1,6 +1,7 @@
 const express = require('express');
-const router = express.Router();
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const config = require('./config');
 
 const userApiRouter = require('./routes/api/user');
 const bookApiRouter = require('./routes/api/book');
@@ -21,6 +22,17 @@ app.use('/api/user', userApiRouter);
 app.use('/api/books', bookApiRouter);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+
+async function start() {
+  try {
+    await mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}/`);
+    });
+  } catch (e) {
+    console.log('DB connect error', e);
+  }
+}
+
+start();
